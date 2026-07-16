@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Lenses Notify</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>My Lenses Notify</h1>
+      <p class="sub">Email when a watched Lens leaves Processing / In Review.</p>
+    </header>
+
+    <section class="card">
+      <label for="email">Your email</label>
+      <div class="row">
+        <input
+          id="email"
+          type="email"
+          placeholder="you@company.com"
+          autocomplete="email"
+        />
+        <button id="saveEmail" type="button">Save</button>
+      </div>
+      <p id="emailHint" class="hint">
+        First email from FormSubmit may ask you to click an activation link.
+      </p>
+      <button id="testEmail" type="button" class="secondary">
+        Send test email
+      </button>
+    </section>
+
+    <section class="card">
+      <label class="check">
+        <input id="keepAwake" type="checkbox" checked />
+        Keep computer awake while watching
+      </label>
+      <p class="hint">
+        Uses Chrome’s built-in keep-awake (Mac + Windows). Release automatically
+        when watching ends. Closing the laptop still stops everything.
+      </p>
+    </section>
+
+    <section class="card">
+      <div class="row between">
+        <h2>Watching</h2>
+        <button id="pollNow" type="button" class="secondary small">
+          Check now
+        </button>
+      </div>
+      <div id="watchList" class="watch-list">
+        <p class="empty">Nothing watching yet. Open a Processing Lens and click Notify me.</p>
+      </div>
+      <p class="hint warn" id="awakeHint">
+        While watching: keep Chrome open. Red icon + badge = active watch.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Last desktop alert</h2>
+      <pre id="desktopLog" class="log">No desktop alerts yet.</pre>
+    </section>
+
+    <section class="card">
+      <h2>Last email attempt</h2>
+      <pre id="emailLog" class="log">No attempts yet.</pre>
+    </section>
+
+    <section class="card">
+      <h2>Last poll</h2>
+      <pre id="pollLog" class="log">No polls yet.</pre>
+    </section>
+
+    <p id="status" class="status" role="status"></p>
+    <script src="popup.js"></script>
+  </body>
+</html>
