@@ -49,3 +49,4 @@ When watching is active, the page shows **Stop watching**, and the extension lis
 - Do **not** close the pinned watcher tab (the extension needs it to check status)
 - Do **not** put the laptop to sleep / close the lid — that pauses watching
 - Leave **Keep computer awake while watching** enabled if you want Chrome to help prevent idle sleep (works even when another app is focused)
+- After you click **Reload** on the extension in `chrome://extensions`, refresh any open My Lenses tabs (or just Reload the extension again — it re-injects). “Extension context invalidated” errors are leftover from the old script and can be cleared.
