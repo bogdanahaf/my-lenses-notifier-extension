@@ -9,6 +9,7 @@ const awakeHint = document.getElementById("awakeHint");
 const emailLogEl = document.getElementById("emailLog");
 const pollLogEl = document.getElementById("pollLog");
 const desktopLogEl = document.getElementById("desktopLog");
+const heartbeatHint = document.getElementById("heartbeatHint");
 
 function setStatus(text, isError = false) {
   statusEl.textContent = text || "";
@@ -18,6 +19,45 @@ function setStatus(text, isError = false) {
 function renderLog(el, log, emptyText) {
   const latest = Array.isArray(log) && log.length ? log[0] : null;
   el.textContent = latest ? JSON.stringify(latest, null, 2) : emptyText;
+}
+
+function renderPollActivity(pollLog, heartbeatAt, heartbeatReason) {
+  if (heartbeatHint) {
+    heartbeatHint.textContent = heartbeatAt
+      ? `Scheduler heartbeat: ${new Date(heartbeatAt).toLocaleTimeString()} (${heartbeatReason || "ping"})`
+      : "Scheduler heartbeat: —";
+  }
+
+  if (!Array.isArray(pollLog) || !pollLog.length) {
+    pollLogEl.textContent = "No polls yet.";
+    return;
+  }
+
+  const lines = pollLog.slice(0, 8).map((entry, index, arr) => {
+    const at = entry.at ? new Date(entry.at).toLocaleTimeString() : "?";
+    const reason = entry.reason || entry.event || "?";
+    const parsed =
+      entry.parseOk === true ||
+      (entry.parseOk == null && entry.ok && Boolean(entry.status));
+    let outcome = "• no parser result (legacy log)";
+    if (parsed) {
+      outcome = `✓ parsed: ${entry.status}`;
+    } else if (entry.error || entry.parseOk === false) {
+      outcome = `✕ parse failed: ${entry.error || "status not found"}`;
+    }
+    let gap = "";
+    if (index < arr.length - 1 && entry.at && arr[index + 1].at) {
+      const ms = Date.parse(entry.at) - Date.parse(arr[index + 1].at);
+      if (Number.isFinite(ms) && ms > 0) {
+        gap = `  (+${Math.round(ms / 1000)}s)`;
+      }
+    }
+    const duration = Number.isFinite(entry.durationMs)
+      ? ` · ${Math.round(entry.durationMs / 100) / 10}s`
+      : "";
+    return `${at}${gap}  ${outcome} · ${reason}${duration}`;
+  });
+  pollLogEl.textContent = lines.join("\n");
 }
 
 function renderWatches(watches) {
@@ -44,9 +84,7 @@ function renderWatches(watches) {
     item.querySelector("strong").textContent = watch.lensName || watch.lensId;
     item.querySelector(".meta").textContent =
       `${watch.lastStatus || watch.initialStatus || "?"} · last seen ${
-        watch.lastSeenAt
-          ? new Date(watch.lastSeenAt).toLocaleTimeString()
-          : "?"
+        watch.lastSeenAt ? new Date(watch.lastSeenAt).toLocaleTimeString() : "?"
       }`;
     item.querySelector("button").addEventListener("click", async () => {
       await chrome.runtime.sendMessage({
@@ -71,7 +109,11 @@ async function refresh() {
   keepAwakeInput.checked = state.keepAwake !== false;
   renderWatches(state.watches);
   renderLog(emailLogEl, state.emailLog, "No attempts yet.");
-  renderLog(pollLogEl, state.pollLog, "No polls yet.");
+  renderPollActivity(
+    state.pollLog,
+    state.lastHeartbeatAt,
+    state.lastHeartbeatReason,
+  );
   desktopLogEl.textContent = state.lastDesktopAlert
     ? JSON.stringify(state.lastDesktopAlert, null, 2)
     : "No desktop alerts yet.";

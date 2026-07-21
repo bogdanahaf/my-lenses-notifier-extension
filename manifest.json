@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "My Lenses Notify",
-  "version": "1.3.5",
+  "version": "2.0.2",
   "description": "Watch My Lenses submissions and email you when status leaves Processing / In Review. Keep Chrome awake while watching.",
   "permissions": [
     "storage",
@@ -17,7 +17,7 @@
     "https://formsubmit.co/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "service-worker.js"
   },
   "action": {
     "default_title": "My Lenses Notify",
@@ -38,13 +38,13 @@
   "web_accessible_resources": [
     {
       "resources": ["sounds/soft-click.wav"],
-      "matches": ["<all_urls>"]
+      "matches": ["https://my-lenses.snapchat.com/*"]
     }
   ],
   "content_scripts": [
     {
       "matches": ["https://my-lenses.snapchat.com/*"],
-      "js": ["shared.js", "content.js"],
+      "js": ["common.js", "page.js"],
       "run_at": "document_idle"
     }
   ]
